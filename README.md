@@ -10,6 +10,29 @@
 
 ![](assets/eye-catch.png)
 
+- [sphinxによるドキュメント化とGitHub Actionsによる自動デプロイ](#sphinxによるドキュメント化とgithub-actionsによる自動デプロイ)
+  - [はじめに](#はじめに)
+  - [環境](#環境)
+  - [`sphinx`によるドキュメント生成](#sphinxによるドキュメント生成)
+    - [ディレクトリ構造とそれぞれのコード内容](#ディレクトリ構造とそれぞれのコード内容)
+    - [`python仮想環境`を作成](#python仮想環境を作成)
+    - [モジュールや拡張のインストール](#モジュールや拡張のインストール)
+    - [動作確認](#動作確認)
+    - [`sphinx`によるドキュメント自動生成](#sphinxによるドキュメント自動生成)
+    - [`source/conf.py`を編集する](#sourceconfpyを編集する)
+  - [`sphinx`をビルドする](#sphinxをビルドする)
+    - [`sphinx-apidoc`](#sphinx-apidoc)
+  - [`rst`ファイルを修正する](#rstファイルを修正する)
+    - [`index.rst`](#indexrst)
+    - [`main.rst`](#mainrst)
+    - [`Module_folder.rst`](#module_folderrst)
+    - [`sphinx-build`](#sphinx-build)
+  - [`theme`の変更](#themeの変更)
+    - [`read the docs`の場合](#read-the-docsの場合)
+    - [`WAGTAIL`の場合](#wagtailの場合)
+  - [`GitHub Actions`による自動デプロイ](#github-actionsによる自動デプロイ)
+
+
 ## 環境
 ```bash
 $ inxi -Sxxx --filter
@@ -18,7 +41,7 @@ System:
     wm: gnome-shell dm: GDM3 42.0 Distro: Ubuntu 22.04.4 LTS (Jammy Jellyfish)
 ```
 
-## 大まかな流れ
+## `sphinx`によるドキュメント生成
 ここでは新しく`sphinx-test`というプロジェクトフォルダを作り、ここに`sphinx`を使ってドキュメント環境を構築していきます。
 
 ### ディレクトリ構造とそれぞれのコード内容
@@ -94,7 +117,8 @@ requires-python = ">=3.8"
 dependencies = [
     "sphinx",
     "sphinx-rtd-theme",
-    "myst-parser"
+    "myst-parser",
+    'sphinx-wagtail-theme'
 ]
 license = {file = "LICENSE"}
 readme = "README.md"
@@ -376,7 +400,9 @@ sphinx-build -a -b html -E source doc
 
 ## `theme`の変更
 テーマ変更についてはたくさんのドキュメントがウェブにありますので、ここでは簡単に紹介します。
+
 ロゴを追加します。
+
 ![](assets/logo.png)
 
 ### `read the docs`の場合
@@ -396,6 +422,7 @@ html_favicon = 'https://raw.githubusercontent.com/yKesamaru/sphinx_documentation
 https://pypi.org/project/sphinx-wagtail-theme/
 
 以下を`conf.py`に加筆修正します。
+ロゴイメージの表示は、`wagtail`ドキュメントとは違い、`source/_static`ディレクトリに配置しないと正常に動作しませんでした。
 ```bash
 extensions = [
     'sphinx.ext.napoleon',
@@ -405,19 +432,116 @@ extensions = [
     'sphinx_wagtail_theme'
 ]
 
+html_theme = 'sphinx_wagtail_theme'
 html_theme_options = dict(
     project_name="SPHINX-TEST",
-    logo="https://raw.githubusercontent.com/yKesamaru/sphinx_documentation/master/assets/logo.png",
+    logo="logo.png",
     logo_alt="logo",
-    logo_url="https://github.com/yKesamaru/sphinx_documentation/tree/master",
-    logo_height=55,
-    logo_width=55,
+    logo_height=50,
+    logo_width=50,
     github_url="https://github.com/yKesamaru/sphinx_documentation/tree/master",
     footer_links=",".join([
         "About Us|https://pypi.org/project/sphinx-wagtail-theme/",
-        "Contact|https://github.com/yKesamaru/sphinx_documentation/tree/master",
-        "Legal|https://github.com/yKesamaru/sphinx_documentation/tree/master",
+        "wagtail github|https://github.com/wagtail/sphinx-wagtail-theme",
+        "wagtail document|https://sphinx-wagtail-theme.readthedocs.io/en/latest/",
     ]),
 )
 ```
 
+今風のモダンな見た目になりました。
+
+![](assets/2024-07-25-12-30-45.png)
+
+## `GitHub Actions`による自動デプロイ
+`.github/workflows/{deploy_to_github_pages}.yml`({}内は任意のファイル名)をプロジェクトルートディレクトリに作成します。
+
+```yml
+name: Deploy Sphinx Docs to GitHub Pages.
+
+on:
+  push:
+    branches:
+        - '**'  # 全てのブランチでトリガー
+
+permissions:
+  contents: write  # 必要な権限を設定
+  id-token: write
+  pages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.10.12'
+
+      - name: Install dependencies
+        run: |
+          pip install -e .
+
+      - name: Generate Sphinx documentation
+        run: |
+          sphinx-apidoc -f -o ./source ./
+          sphinx-apidoc -f -o ./source ./Module_folder
+          sphinx-build -a -b html -E ./source ./doc
+
+      - name: List uploaded artifacts  # アーティファクトの内容をリスト表示
+        run: ls -al ./doc
+
+      - name: Upload artifact for GitHub Pages
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: ./doc
+          name: github-pages
+          retention-days: 1
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifact_name: github-pages
+```
+
+崩れを防止するために以下のファイルを追加します。
+```bash
+touch doc/.nojekyll
+```
+
+次に`GitHub Pages`の設定を変更し、保存しておきます。
+![](assets/2024-07-25-14-40-52.png)
+
+![](assets/2024-07-25-16-08-35.png)
+
+![](assets/2024-07-25-14-41-35.png)
+
+![](assets/2024-07-25-16-04-36.png)
+
+それぞれ上記のスクリーンショットのようにパーミッションを変更します。
+
+ビルドまではできるのですが、この日はサーバーエラーでデプロイ出来ませんでした。
+
+```bash
+Error: Creating Pages deployment failed
+Error: HttpError: Invalid environment node id
+    at /home/runner/work/_actions/actions/deploy-pages/v3/node_modules/@octokit/request/dist-node/index.js:124:1
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at createPagesDeployment (/home/runner/work/_actions/actions/deploy-pages/v3/src/internal/api-client.js:126:1)
+    at Deployment.create (/home/runner/work/_actions/actions/deploy-pages/v3/src/internal/deployment.js:80:1)
+    at main (/home/runner/work/_actions/actions/deploy-pages/v3/src/index.js:30:1)
+Error: Error: Failed to create deployment (status: 500) with build version cd3e92e90d67a66b56f7c47ecf21fd6ab9d7c9ca. Server error, is githubstatus.com reporting a Pages outage? Please re-run the deployment at a later time.
+```
+
+![](assets/2024-07-25-19-26-33.png)
+
+この場合、WEB上で`deploy`だけリトライさせることが出来ます。
