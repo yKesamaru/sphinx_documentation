@@ -385,3 +385,5 @@ sphinx-build -a -b html -E source doc
 html_theme = 'sphinx_rtd_theme'
 html_logo = 'https://raw.githubusercontent.com/yKesamaru/FACE01_DEV/master/assets/images/Logo_dist.png'
 html_favicon = 'https://raw.githubusercontent.com/yKesamaru/FACE01_DEV/master/assets/images/Logo.ico'
+```
+変更が終わったら`sphinx-build`を実行します。
