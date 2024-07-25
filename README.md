@@ -8,7 +8,7 @@
 
 ですので襟を正して、きっちりとアウトプットをしておきます。
 
-![](assets/eye-catch.png)
+![](https://raw.githubusercontent.com/yKesamaru/sphinx_documentation/master/assets/eye-catch.png)
 
 - [sphinxによるドキュメント化とGitHub Actionsによる自動デプロイ](#sphinxによるドキュメント化とgithub-actionsによる自動デプロイ)
   - [はじめに](#はじめに)
@@ -325,7 +325,7 @@ APIドキュメントのソースファイルを生成します。
 ### `rst`ファイルを修正する
 この時点で、`source`ディレクトリには複数の`rst`ファイルが作成されているはずです。**（作成されていない場合はモジュールが含まれるディレクトリを対象に、`sphinx-apidoc`を再度実行してください。）**
 
-![](assets/2024-07-25-11-32-35.png)
+![](https://raw.githubusercontent.com/yKesamaru/sphinx_documentation/master/assets/2024-07-25-11-32-35.png)
 
 `index.rst`が`HTML`でいうところの`index.html`、つまりドキュメントのホームページになります。
 `index.rst`に`main.rst`と`Module_folder.rst`へのリンクを貼ります。
@@ -400,27 +400,27 @@ sphinx-build -a -b html -E source doc
 
 うまくいけば、下記のようにドキュメントが生成されます。（`doc/index.html`）
 
-![](assets/2024-07-25-09-21-25.png)
+![](https://raw.githubusercontent.com/yKesamaru/sphinx_documentation/master/assets/2024-07-25-09-21-25.png)
 
 ### `theme`の変更
 テーマ変更についてはたくさんのドキュメントがウェブにありますので、ここでは簡単に紹介します。
 
 ロゴを追加します。
 
-![](assets/logo.png)
+![](https://raw.githubusercontent.com/yKesamaru/sphinx_documentation/master/assets/logo.png)
 
 ### `read the docs`の場合
 以下を`conf.py`に加筆修正します。
 
 ```bash
 html_theme = 'sphinx_rtd_theme'
-html_logo = 'https://raw.githubusercontent.com/yKesamaru/sphinx_documentation/master/assets/logo.png'
-html_favicon = 'https://raw.githubusercontent.com/yKesamaru/sphinx_documentation/master/assets/logo.ico'
+html_logo = 'https://raw.githubusercontent.com/yKesamaru/sphinx_documentation/master/https://raw.githubusercontent.com/yKesamaru/sphinx_documentation/master/assets/logo.png'
+html_favicon = 'https://raw.githubusercontent.com/yKesamaru/sphinx_documentation/master/https://raw.githubusercontent.com/yKesamaru/sphinx_documentation/master/assets/logo.ico'
 ```
 
 変更が終わったら`sphinx-build`を実行します。
 
-![](assets/2024-07-25-12-03-40.png)
+![](https://raw.githubusercontent.com/yKesamaru/sphinx_documentation/master/assets/2024-07-25-12-03-40.png)
 
 ### `WAGTAIL`の場合
 まず`pip`でテーマをインストールします。
@@ -458,7 +458,7 @@ html_theme_options = dict(
 
 今風のモダンな見た目になりました。
 
-![](assets/2024-07-25-12-30-45.png)
+![](https://raw.githubusercontent.com/yKesamaru/sphinx_documentation/master/assets/2024-07-25-12-30-45.png)
 
 ## `GitHub Actions`による自動デプロイ
 `.github/workflows/{deploy_to_github_pages}.yml`({}内は任意のファイル名)をプロジェクトルートディレクトリに作成します。
@@ -529,18 +529,18 @@ touch doc/.nojekyll
 
 次に`GitHub Pages`の設定を変更し、保存しておきます。
 
-![](assets/2024-07-25-14-40-52.png)
+![](https://raw.githubusercontent.com/yKesamaru/sphinx_documentation/master/assets/2024-07-25-14-40-52.png)
 
 
-![](assets/2024-07-25-14-41-35.png)
+![](https://raw.githubusercontent.com/yKesamaru/sphinx_documentation/master/assets/2024-07-25-14-41-35.png)
 
-![](assets/2024-07-25-16-04-36.png)
+![](https://raw.githubusercontent.com/yKesamaru/sphinx_documentation/master/assets/2024-07-25-16-04-36.png)
 
-![](assets/2024-07-25-21-14-12.png)
+![](https://raw.githubusercontent.com/yKesamaru/sphinx_documentation/master/assets/2024-07-25-21-14-12.png)
 
 それぞれ上記のスクリーンショットのようにパーミッションを変更します。
 
-![](assets/2024-07-25-19-26-33.png)
+![](https://raw.githubusercontent.com/yKesamaru/sphinx_documentation/master/assets/2024-07-25-19-26-33.png)
 
 この日はサーバーエラーが発生しました。
 この場合、WEB上で`deploy`だけリトライさせることが出来ます。
@@ -549,7 +549,7 @@ touch doc/.nojekyll
 
 https://ykesamaru.github.io/sphinx-test/
 
-![](assets/2024-07-25-21-15-55.png)
+![](https://raw.githubusercontent.com/yKesamaru/sphinx_documentation/master/assets/2024-07-25-21-15-55.png)
 
 ## 最後に
 散々こすられている`sphinxによるドキュメント生成と自動デプロイ`ですが、自分だけハマるポイントというのが結構あるものです。そのようなポイントに限ってどのドキュメントにも載っていなかったりするものです。
