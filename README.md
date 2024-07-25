@@ -2,11 +2,11 @@
 
 ## はじめに
 3ヶ月後の自分は他人、とはよく言ったもので、特に自動化をしていた部分に関しては、なにをどうやってこのようなシステムを作ったのか全く覚えていないことがあります。
-わたしの場合、`sphinx`によってドキュメントを自動デプロイする環境を作り、それを忘れないためにドキュメント化をしていたのですが、悪いことにドキュメントを完成させずにドキュメントの存在自体を忘れ、時間と労力を無駄にしました。
+わたしの場合、`sphinx`によってドキュメントを自動デプロイする環境を作り、それを忘れないためにドキュメント化をしていたのですが、悪いことにドキュメントを完成させずにドキュメントの存在自体を忘れ、再構築に時間と労力を無駄にしました。
 さきほどその作りかけのドキュメントを発見し、膝から崩れ落ちるとはこの事か…という気分を味わいました。
 `sphinx`でのハマりどころの解法が書いてありました。書いてありましたとも。
 
-ですので襟を正してアウトプットをしておきます。
+ですので襟を正して、きっちりとアウトプットをしておきます。
 
 ![](assets/eye-catch.png)
 
@@ -20,17 +20,18 @@
     - [動作確認](#動作確認)
     - [`sphinx`によるドキュメント自動生成](#sphinxによるドキュメント自動生成)
     - [`source/conf.py`を編集する](#sourceconfpyを編集する)
-  - [`sphinx`をビルドする](#sphinxをビルドする)
+    - [`sphinx`をビルドする](#sphinxをビルドする)
     - [`sphinx-apidoc`](#sphinx-apidoc)
-  - [`rst`ファイルを修正する](#rstファイルを修正する)
+    - [`rst`ファイルを修正する](#rstファイルを修正する)
     - [`index.rst`](#indexrst)
     - [`main.rst`](#mainrst)
     - [`Module_folder.rst`](#module_folderrst)
     - [`sphinx-build`](#sphinx-build)
-  - [`theme`の変更](#themeの変更)
+    - [`theme`の変更](#themeの変更)
     - [`read the docs`の場合](#read-the-docsの場合)
     - [`WAGTAIL`の場合](#wagtailの場合)
   - [`GitHub Actions`による自動デプロイ](#github-actionsによる自動デプロイ)
+  - [最後に](#最後に)
 
 
 ## 環境
@@ -56,6 +57,7 @@ user@user:~/bin/sphinx-test$ tree
 
 それぞれのファイルの内容は以下のようにします。
 
+`main.py`
 ```python: main.py
 from Module_folder.my_library import greet
 
@@ -77,6 +79,7 @@ if __name__ == "__main__":
 
 ```
 
+`Module_folder/my_library.py`
 ```python: Module_folder/my_library.py
 def greet():
     """
@@ -307,21 +310,21 @@ source_parsers = {
 
 ```
 
-## `sphinx`をビルドする
+### `sphinx`をビルドする
 ここまで用意が出来たら`sphinx`をビルドします。
 ### `sphinx-apidoc`
 `sphinx-apidoc -f -o {conf.pyのあるディレクトリ} {プロジェクトルートディレクトリ}`
 `sphinx-apidoc -f -o {conf.pyのあるディレクトリ} {モジュールのあるディレクトリ}`
 APIドキュメントのソースファイルを生成します。
-`docstring`を含むスクリプトファイルが存在するディレクトリに対して複数回実行する必要があります。（少なくともわたしの場合は）
+**`docstring`を含むスクリプトファイルが存在するディレクトリに対して複数回実行する必要があります。（少なくともわたしの場合は）**
 `-o`で指定した`{conf.pyのあるディレクトリ}`は、新たに作成したドキュメント用のディレクトリを選んでもOk。
 `sphinx-apidoc`を実行することにより、出力先のディレクトリに`rstファイル`が作成されます。
 これらの`rstファイル`を`index.rst`に記述することにより、各ドキュメントの関連付けが行われます。
 この関連付けに矛盾点があると、次に実行する`sphinx-build`コマンドでエラーが出力されます。
 
+### `rst`ファイルを修正する
+この時点で、`source`ディレクトリには複数の`rst`ファイルが作成されているはずです。**（作成されていない場合はモジュールが含まれるディレクトリを対象に、`sphinx-apidoc`を再度実行してください。）**
 
-## `rst`ファイルを修正する
-この時点で、`source`ディレクトリには複数の`rst`ファイルが作成されているはずです。（作成されていない場合はもじゅーるが含まれるディレクトリを対象に、`sphinx-apidoc`を再度実行してください。
 ![](assets/2024-07-25-11-32-35.png)
 
 `index.rst`が`HTML`でいうところの`index.html`、つまりドキュメントのホームページになります。
@@ -396,9 +399,10 @@ sphinx-build -a -b html -E source doc
 ```
 
 うまくいけば、下記のようにドキュメントが生成されます。（`doc/index.html`）
+
 ![](assets/2024-07-25-09-21-25.png)
 
-## `theme`の変更
+### `theme`の変更
 テーマ変更についてはたくさんのドキュメントがウェブにありますので、ここでは簡単に紹介します。
 
 ロゴを追加します。
@@ -407,12 +411,15 @@ sphinx-build -a -b html -E source doc
 
 ### `read the docs`の場合
 以下を`conf.py`に加筆修正します。
+
 ```bash
 html_theme = 'sphinx_rtd_theme'
 html_logo = 'https://raw.githubusercontent.com/yKesamaru/sphinx_documentation/master/assets/logo.png'
 html_favicon = 'https://raw.githubusercontent.com/yKesamaru/sphinx_documentation/master/assets/logo.ico'
 ```
+
 変更が終わったら`sphinx-build`を実行します。
+
 ![](assets/2024-07-25-12-03-40.png)
 
 ### `WAGTAIL`の場合
@@ -422,7 +429,8 @@ html_favicon = 'https://raw.githubusercontent.com/yKesamaru/sphinx_documentation
 https://pypi.org/project/sphinx-wagtail-theme/
 
 以下を`conf.py`に加筆修正します。
-ロゴイメージの表示は、`wagtail`ドキュメントとは違い、`source/_static`ディレクトリに配置しないと正常に動作しませんでした。
+ロゴイメージの表示は、`wagtail`ドキュメントの記述と異なり、`source/_static`ディレクトリに配置しないと正常に動作しませんでした。バージョンにより相違があるのかも知れません。
+
 ```bash
 extensions = [
     'sphinx.ext.napoleon',
@@ -514,34 +522,44 @@ jobs:
 ```
 
 崩れを防止するために以下のファイルを追加します。
+
 ```bash
 touch doc/.nojekyll
 ```
 
 次に`GitHub Pages`の設定を変更し、保存しておきます。
+
 ![](assets/2024-07-25-14-40-52.png)
 
-![](assets/2024-07-25-16-08-35.png)
 
 ![](assets/2024-07-25-14-41-35.png)
 
 ![](assets/2024-07-25-16-04-36.png)
 
+![](assets/2024-07-25-21-14-12.png)
+
 それぞれ上記のスクリーンショットのようにパーミッションを変更します。
-
-ビルドまではできるのですが、この日はサーバーエラーでデプロイ出来ませんでした。
-
-```bash
-Error: Creating Pages deployment failed
-Error: HttpError: Invalid environment node id
-    at /home/runner/work/_actions/actions/deploy-pages/v3/node_modules/@octokit/request/dist-node/index.js:124:1
-    at processTicksAndRejections (node:internal/process/task_queues:95:5)
-    at createPagesDeployment (/home/runner/work/_actions/actions/deploy-pages/v3/src/internal/api-client.js:126:1)
-    at Deployment.create (/home/runner/work/_actions/actions/deploy-pages/v3/src/internal/deployment.js:80:1)
-    at main (/home/runner/work/_actions/actions/deploy-pages/v3/src/index.js:30:1)
-Error: Error: Failed to create deployment (status: 500) with build version cd3e92e90d67a66b56f7c47ecf21fd6ab9d7c9ca. Server error, is githubstatus.com reporting a Pages outage? Please re-run the deployment at a later time.
-```
 
 ![](assets/2024-07-25-19-26-33.png)
 
+この日はサーバーエラーが発生しました。
 この場合、WEB上で`deploy`だけリトライさせることが出来ます。
+
+最終的にデプロイ出来ましたのでリンクを以下に貼ります。
+
+https://ykesamaru.github.io/sphinx-test/
+
+![](assets/2024-07-25-21-15-55.png)
+
+## 最後に
+散々こすられている`sphinxによるドキュメント生成と自動デプロイ`ですが、自分だけハマるポイントというのが結構あるものです。そのようなポイントに限ってどのドキュメントにも載っていなかったりするものです。
+
+たとえば
+- `sphinx-apidoc`を、コードが存在する複数のディレクトリに対して複数回行う
+
+はどのサイトにも（わたしの観測圏内では）見当たりませんでした。
+これらは環境が変わるとまた違った結果になるのかも知れません。
+
+以上です。ありがとうございました。
+
+
