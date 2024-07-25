@@ -380,10 +380,44 @@ sphinx-build -a -b html -E source doc
 ![](assets/logo.png)
 
 ### `read the docs`の場合
-以下を追加修正します。
+以下を`conf.py`に加筆修正します。
 ```bash
 html_theme = 'sphinx_rtd_theme'
 html_logo = 'https://raw.githubusercontent.com/yKesamaru/sphinx_documentation/master/assets/logo.png'
 html_favicon = 'https://raw.githubusercontent.com/yKesamaru/sphinx_documentation/master/assets/logo.ico'
 ```
 変更が終わったら`sphinx-build`を実行します。
+![](assets/2024-07-25-12-03-40.png)
+
+### `WAGTAIL`の場合
+まず`pip`でテーマをインストールします。
+`pip install sphinx-wagtail-theme`
+
+https://pypi.org/project/sphinx-wagtail-theme/
+
+以下を`conf.py`に加筆修正します。
+```bash
+extensions = [
+    'sphinx.ext.napoleon',
+    'sphinx.ext.autodoc',
+    'sphinx.ext.intersphinx',
+    'myst_parser',
+    'sphinx_wagtail_theme'
+]
+
+html_theme_options = dict(
+    project_name="SPHINX-TEST",
+    logo="https://raw.githubusercontent.com/yKesamaru/sphinx_documentation/master/assets/logo.png",
+    logo_alt="logo",
+    logo_url="https://github.com/yKesamaru/sphinx_documentation/tree/master",
+    logo_height=55,
+    logo_width=55,
+    github_url="https://github.com/yKesamaru/sphinx_documentation/tree/master",
+    footer_links=",".join([
+        "About Us|https://pypi.org/project/sphinx-wagtail-theme/",
+        "Contact|https://github.com/yKesamaru/sphinx_documentation/tree/master",
+        "Legal|https://github.com/yKesamaru/sphinx_documentation/tree/master",
+    ]),
+)
+```
+
